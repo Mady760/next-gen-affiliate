@@ -3,9 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Calendar, Clock, Tag, Share2, Bookmark, ThumbsUp, User } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 
-// Sample post data (replace with actual data fetching)
 const postData = {
   title: 'The Ultimate Guide to Affiliate Marketing in 2023',
   slug: 'ultimate-guide-affiliate-marketing',
@@ -49,7 +48,6 @@ const postData = {
 const Post = () => {
   const { slug } = useParams();
 
-  // Replace with actual data fetching based on the slug
   if (!slug || slug !== postData.slug) {
     return <div>Post not found</div>;
   }
@@ -60,7 +58,6 @@ const Post = () => {
 
       <main className="flex-1 py-12 px-6">
         <div className="max-w-4xl mx-auto">
-          {/* Post Header */}
           <header className="mb-8">
             <h1 className="text-4xl font-bold mb-4">{postData.title}</h1>
             <div className="flex items-center text-muted-foreground text-sm mb-2">
@@ -83,13 +80,10 @@ const Post = () => {
             </div>
           </header>
 
-          {/* Featured Image */}
           <img src={postData.featuredImage} alt={postData.title} className="w-full rounded-lg mb-6" />
 
-          {/* Post Content */}
           <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: postData.content }} />
 
-          {/* Post Footer */}
           <footer className="mt-12 py-4 border-t border-border flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <Button variant="ghost">
