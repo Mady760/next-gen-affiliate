@@ -11,12 +11,13 @@ import {
   Linkedin, 
   Copy, 
   MessageSquare, 
-  ThumbsUp 
+  ThumbsUp,
+  User
 } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import BlogCard from '@/components/ui/BlogCard';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const postData = {
