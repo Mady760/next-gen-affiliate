@@ -1,9 +1,16 @@
 
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 // Authentication middleware to check if user is logged in
 export const requireAuth = async () => {
+  // Check if Supabase is configured
+  if (!isSupabaseConfigured()) {
+    toast.error('Supabase is not properly configured. Please set environment variables.');
+    console.error('Error: Supabase URL and Anon Key must be configured');
+    return false;
+  }
+
   const { data: { session } } = await supabase.auth.getSession();
   
   if (!session) {
@@ -20,6 +27,13 @@ export const requireAuth = async () => {
 
 // Authorization middleware to check if user has admin role
 export const requireAdmin = async () => {
+  // Check if Supabase is configured
+  if (!isSupabaseConfigured()) {
+    toast.error('Supabase is not properly configured. Please set environment variables.');
+    console.error('Error: Supabase URL and Anon Key must be configured');
+    return false;
+  }
+
   // First check if user is authenticated
   const isAuth = await requireAuth();
   

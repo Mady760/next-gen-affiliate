@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Layout, 
-  LucideHome, 
+  Home as LucideHome, 
   FileText, 
   Users, 
   BarChart3, 
@@ -14,14 +13,14 @@ import {
   Edit2, 
   Trash2, 
   MoreHorizontal, 
-  EyeIcon, 
+  Eye as EyeIcon, 
   Filter,
   Link,
   DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { requireAdmin } from '@/middleware/authMiddleware';
 import { toast } from 'sonner';
 
@@ -94,6 +93,12 @@ const Admin = () => {
   
   useEffect(() => {
     const checkAuth = async () => {
+      if (!isSupabaseConfigured()) {
+        toast.error('Supabase is not properly configured. Please set environment variables.');
+        setLoading(false);
+        return;
+      }
+      
       const isAdmin = await requireAdmin();
       if (!isAdmin) {
         navigate('/login');
@@ -374,11 +379,8 @@ const Admin = () => {
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                   <h2 className="text-xl font-semibold mb-4 sm:mb-0">Blog Posts</h2>
                   <div className="flex space-x-2">
-                    <Button 
-                      variant="outline" 
-                      icon={<Plus size={16} />} 
-                      iconPosition="left"
-                    >
+                    <Button variant="outline">
+                      <Plus size={16} className="mr-2" />
                       New Post
                     </Button>
                     <div className="relative">
@@ -481,86 +483,8 @@ const Admin = () => {
               <div className="p-6 border-b border-border">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                   <h2 className="text-xl font-semibold mb-4 sm:mb-0">Affiliate Programs</h2>
-                  <Button variant="outline" icon={<Plus size={16} />} iconPosition="left">
-                    Add Program
-                  </Button>
-                </div>
-              </div>
-              <div className="p-6">
-                <p className="text-muted-foreground mb-4">Manage your affiliate programs and track performance.</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="border border-border rounded-lg p-4 hover:bg-secondary/20 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium">Amazon Associates</h3>
-                        <p className="text-sm text-muted-foreground">Commission: 3-10%</p>
-                      </div>
-                      <div className="p-2 bg-primary/10 rounded-md">
-                        <DollarSign size={18} className="text-primary" />
-                      </div>
-                    </div>
-                    <div className="mt-3 flex items-center text-sm">
-                      <span className="text-green-600 font-medium">Active</span>
-                      <span className="mx-2">•</span>
-                      <span>256 clicks this month</span>
-                    </div>
-                  </div>
-                  <div className="border border-border rounded-lg p-4 hover:bg-secondary/20 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium">ShareASale</h3>
-                        <p className="text-sm text-muted-foreground">Commission: Up to 30%</p>
-                      </div>
-                      <div className="p-2 bg-primary/10 rounded-md">
-                        <DollarSign size={18} className="text-primary" />
-                      </div>
-                    </div>
-                    <div className="mt-3 flex items-center text-sm">
-                      <span className="text-green-600 font-medium">Active</span>
-                      <span className="mx-2">•</span>
-                      <span>128 clicks this month</span>
-                    </div>
-                  </div>
-                  <div className="border border-border rounded-lg p-4 hover:bg-secondary/20 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium">CJ Affiliate</h3>
-                        <p className="text-sm text-muted-foreground">Commission: Varies by merchant</p>
-                      </div>
-                      <div className="p-2 bg-primary/10 rounded-md">
-                        <DollarSign size={18} className="text-primary" />
-                      </div>
-                    </div>
-                    <div className="mt-3 flex items-center text-sm">
-                      <span className="text-yellow-600 font-medium">Pending</span>
-                      <span className="mx-2">•</span>
-                      <span>Application in review</span>
-                    </div>
-                  </div>
-                  <div className="border border-border rounded-lg p-4 hover:bg-secondary/20 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium">Impact</h3>
-                        <p className="text-sm text-muted-foreground">Commission: 5-25%</p>
-                      </div>
-                      <div className="p-2 bg-primary/10 rounded-md">
-                        <DollarSign size={18} className="text-primary" />
-                      </div>
-                    </div>
-                    <div className="mt-3 flex items-center text-sm">
-                      <span className="text-green-600 font-medium">Active</span>
-                      <span className="mx-2">•</span>
-                      <span>92 clicks this month</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
-  );
-};
+                  <div className="flex space-x-2">
+                    <Button variant="outline">
+                      <Plus size={16} className="mr-2" />
+                      Add
 
-export default Admin;
