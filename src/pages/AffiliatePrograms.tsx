@@ -1,107 +1,43 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, ExternalLink, Tag, Star, DollarSign, Percent } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { fetchAffiliatePrograms, AffiliateProgram } from '@/services/affiliateService';
 
-// Sample affiliate programs data - will be replaced with Supabase data
-const affiliateProgramsData = [
-  {
-    id: '1',
-    name: 'Amazon Associates',
-    description: 'One of the largest affiliate programs with millions of products across various categories.',
-    category: 'Retail',
-    commissionRate: '1-10%',
-    cookieDuration: '24 hours',
-    paymentThreshold: '$10',
-    rating: 4.5,
-    website: 'https://affiliate-program.amazon.com/',
-    logo: 'https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    id: '2',
-    name: 'ShareASale',
-    description: 'A large affiliate network with thousands of merchants across various niches.',
-    category: 'Network',
-    commissionRate: 'Varies',
-    cookieDuration: '30 days',
-    paymentThreshold: '$50',
-    rating: 4.2,
-    website: 'https://www.shareasale.com/',
-    logo: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    id: '3',
-    name: 'Awin',
-    description: 'Global affiliate network with advertisers across retail, telecom, travel and finance.',
-    category: 'Network',
-    commissionRate: 'Varies',
-    cookieDuration: '30-45 days',
-    paymentThreshold: '$20',
-    rating: 4.3,
-    website: 'https://www.awin.com/',
-    logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    id: '4',
-    name: 'ClickBank',
-    description: 'Specializes in digital products including e-books, software, and online courses.',
-    category: 'Digital Products',
-    commissionRate: '50-75%',
-    cookieDuration: '60 days',
-    paymentThreshold: '$10',
-    rating: 4.0,
-    website: 'https://www.clickbank.com/',
-    logo: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    id: '5',
-    name: 'CJ Affiliate',
-    description: 'Premium affiliate marketing with major retail, travel, and financial brands.',
-    category: 'Network',
-    commissionRate: 'Varies',
-    cookieDuration: '30 days',
-    paymentThreshold: '$50',
-    rating: 4.4,
-    website: 'https://www.cj.com/',
-    logo: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  },
-  {
-    id: '6',
-    name: 'HostGator',
-    description: 'Web hosting affiliate program with high commissions and long cookie duration.',
-    category: 'Hosting',
-    commissionRate: '$65-125 per sale',
-    cookieDuration: '60 days',
-    paymentThreshold: '$100',
-    rating: 4.1,
-    website: 'https://www.hostgator.com/affiliates',
-    logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
-  }
-];
-
-// Available categories for filtering
-const categories = [
-  'All Categories',
-  'Retail',
-  'Network',
-  'Digital Products',
-  'Hosting',
-  'Travel',
-  'Finance'
-];
+// Available categories for filtering, we'll populate this dynamically
+const initialCategories = ['All Categories'];
 
 const AffiliatePrograms = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [categories, setCategories] = useState(initialCategories);
   
-  const filteredPrograms = affiliateProgramsData.filter(program => {
+  const { data: affiliatePrograms = [], isLoading, error } = useQuery({
+    queryKey: ['affiliatePrograms'],
+    queryFn: fetchAffiliatePrograms,
+  });
+  
+  // Extract unique categories from affiliate programs
+  useEffect(() => {
+    if (affiliatePrograms.length > 0) {
+      const uniqueCategories = ['All Categories', ...new Set(
+        affiliatePrograms
+          .map(program => program.category)
+          .filter(Boolean) as string[]
+      )];
+      setCategories(uniqueCategories);
+    }
+  }, [affiliatePrograms]);
+  
+  const filteredPrograms = affiliatePrograms.filter(program => {
     const matchesSearch = program.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.description.toLowerCase().includes(searchTerm.toLowerCase());
+      (program.description?.toLowerCase() || '').includes(searchTerm.toLowerCase());
       
     const matchesCategory = selectedCategory === 'All Categories' || program.category === selectedCategory;
     
@@ -158,6 +94,30 @@ const AffiliatePrograms = () => {
                 {selectedCategory === 'All Categories' ? 'Filter by Category' : selectedCategory}
               </button>
             </div>
+            
+            {isFilterOpen && (
+              <div className="mt-4 md:hidden">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {categories.map(category => (
+                    <button 
+                      key={category}
+                      onClick={() => {
+                        setSelectedCategory(category);
+                        setIsFilterOpen(false);
+                      }}
+                      className={cn(
+                        "px-4 py-1.5 rounded-full text-sm transition-colors",
+                        selectedCategory === category 
+                          ? "bg-primary text-white" 
+                          : "bg-secondary text-foreground hover:bg-secondary/80"
+                      )}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -171,42 +131,72 @@ const AffiliatePrograms = () => {
               : `${selectedCategory} Programs`}
           </h2>
           
-          {filteredPrograms.length > 0 ? (
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="glass-card h-[400px] animate-pulse">
+                  <div className="h-48 bg-secondary/50"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="h-6 bg-secondary/50 rounded w-3/4"></div>
+                    <div className="h-4 bg-secondary/50 rounded w-full"></div>
+                    <div className="h-4 bg-secondary/50 rounded w-full"></div>
+                    <div className="h-10 bg-secondary/50 rounded w-full mt-8"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <h3 className="text-lg font-medium mb-2">Error loading affiliate programs</h3>
+              <p className="text-muted-foreground mb-6">
+                There was an error loading the affiliate programs. Please try again later.
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Refresh Page
+              </Button>
+            </div>
+          ) : filteredPrograms.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredPrograms.map((program) => (
                 <div 
                   key={program.id}
                   className="glass-card overflow-hidden hover:shadow-lg transition-shadow duration-300"
                 >
-                  <div className="h-48 relative">
-                    <img 
-                      src={program.logo}
-                      alt={program.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="h-48 relative bg-secondary/30 flex items-center justify-center">
+                    {program.logo ? (
+                      <img 
+                        src={program.logo}
+                        alt={program.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-5xl font-bold text-primary/30">
+                        {program.name.charAt(0)}
+                      </div>
+                    )}
                     <div className="absolute top-0 left-0 mt-4 ml-4">
                       <span className="bg-background/80 backdrop-blur-sm text-foreground px-3 py-1 rounded-full text-xs font-medium">
-                        {program.category}
+                        {program.category || 'Uncategorized'}
                       </span>
                     </div>
                     <div className="absolute top-0 right-0 mt-4 mr-4">
                       <div className="flex items-center bg-background/80 backdrop-blur-sm text-foreground px-3 py-1 rounded-full">
                         <Star size={14} className="text-yellow-500 mr-1" />
-                        <span className="text-xs font-medium">{program.rating}</span>
+                        <span className="text-xs font-medium">{program.rating || '0.0'}</span>
                       </div>
                     </div>
                   </div>
                   
                   <div className="p-6">
                     <h3 className="text-xl font-bold mb-2">{program.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-4">{program.description}</p>
+                    <p className="text-muted-foreground text-sm mb-4">{program.description || 'No description available.'}</p>
                     
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div className="flex items-start">
                         <Percent size={16} className="text-primary mt-0.5 mr-2 shrink-0" />
                         <div>
                           <p className="text-xs text-muted-foreground">Commission</p>
-                          <p className="text-sm font-medium">{program.commissionRate}</p>
+                          <p className="text-sm font-medium">{program.commission || 'Varies'}</p>
                         </div>
                       </div>
                       
@@ -214,7 +204,7 @@ const AffiliatePrograms = () => {
                         <Tag size={16} className="text-primary mt-0.5 mr-2 shrink-0" />
                         <div>
                           <p className="text-xs text-muted-foreground">Cookie</p>
-                          <p className="text-sm font-medium">{program.cookieDuration}</p>
+                          <p className="text-sm font-medium">{program.cookie_duration || 'N/A'}</p>
                         </div>
                       </div>
                       
@@ -222,21 +212,25 @@ const AffiliatePrograms = () => {
                         <DollarSign size={16} className="text-primary mt-0.5 mr-2 shrink-0" />
                         <div>
                           <p className="text-xs text-muted-foreground">Min. Payout</p>
-                          <p className="text-sm font-medium">{program.paymentThreshold}</p>
+                          <p className="text-sm font-medium">{program.payment_threshold || 'N/A'}</p>
                         </div>
                       </div>
                     </div>
                     
                     <div className="flex justify-between items-center">
-                      <a 
-                        href={program.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary text-sm hover:underline flex items-center"
-                      >
-                        Visit Website
-                        <ExternalLink size={14} className="ml-1" />
-                      </a>
+                      {program.website ? (
+                        <a 
+                          href={program.website} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary text-sm hover:underline flex items-center"
+                        >
+                          Visit Website
+                          <ExternalLink size={14} className="ml-1" />
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">No website</span>
+                      )}
                       
                       <Button variant="outline" size="sm">
                         View Details

@@ -9,7 +9,132 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      affiliate_programs: {
+        Row: {
+          category: string | null
+          commission: string | null
+          cookie_duration: string | null
+          description: string | null
+          id: string
+          logo: string | null
+          name: string
+          payment_threshold: string | null
+          rating: number | null
+          status: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          category?: string | null
+          commission?: string | null
+          cookie_duration?: string | null
+          description?: string | null
+          id?: string
+          logo?: string | null
+          name: string
+          payment_threshold?: string | null
+          rating?: number | null
+          status?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          category?: string | null
+          commission?: string | null
+          cookie_duration?: string | null
+          description?: string | null
+          id?: string
+          logo?: string | null
+          name?: string
+          payment_threshold?: string | null
+          rating?: number | null
+          status?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      auth: {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author: string | null
+          category: string | null
+          content: string | null
+          date: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          views: number | null
+        }
+        Insert: {
+          author?: string | null
+          category?: string | null
+          content?: string | null
+          date?: string
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          views?: number | null
+        }
+        Update: {
+          author?: string | null
+          category?: string | null
+          content?: string | null
+          date?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          id: string
+          last_updated: string
+          total_earnings: number | null
+          total_posts: number | null
+          total_users: number | null
+          total_views: number | null
+        }
+        Insert: {
+          id?: string
+          last_updated?: string
+          total_earnings?: number | null
+          total_posts?: number | null
+          total_users?: number | null
+          total_views?: number | null
+        }
+        Update: {
+          id?: string
+          last_updated?: string
+          total_earnings?: number | null
+          total_posts?: number | null
+          total_users?: number | null
+          total_views?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
