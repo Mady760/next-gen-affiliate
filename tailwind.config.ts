@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -84,12 +85,52 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+                'fade-in': {
+                    '0%': { opacity: '0' },
+                    '100%': { opacity: '1' }
+                },
+                'fade-up': {
+                    '0%': { opacity: '0', transform: 'translateY(10px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' }
+                },
+                'fade-down': {
+                    '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' }
+                },
+                'pulse-subtle': {
+                    '0%, 100%': { opacity: '1' },
+                    '50%': { opacity: '0.85' }
+                }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+                'fade-in': 'fade-in 0.6s ease-out',
+                'fade-up': 'fade-up 0.7s ease-out',
+                'fade-down': 'fade-down 0.7s ease-out',
+                'pulse-subtle': 'pulse-subtle 4s ease-in-out infinite'
+			},
+            fontFamily: {
+                sans: ['Inter', 'system-ui', 'sans-serif'],
+                serif: ['Georgia', 'serif'],
+                mono: ['monospace']
+            },
+            screens: {
+                'xs': '475px'
+            },
+            boxShadow: {
+                'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+                'glass-strong': '0 4px 30px rgba(0, 0, 0, 0.2)',
+                'glass-bold': '0 8px 32px rgba(0, 0, 0, 0.15)'
+            },
+            backdropBlur: {
+                'xs': '2px'
+            },
+            fontSize: {
+                'title': ['2.5rem', { lineHeight: '1.25', letterSpacing: '-0.02em', fontWeight: '700' }],
+                'subtitle': ['1.75rem', { lineHeight: '1.35', letterSpacing: '-0.01em', fontWeight: '600' }]
+            }
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
