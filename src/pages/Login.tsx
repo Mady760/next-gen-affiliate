@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
-import Button from '@/components/ui/Button';
+import Button from '@/components/ui/button';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 
 const Login = () => {
   const [email, setEmail] = useState('');

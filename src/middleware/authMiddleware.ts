@@ -16,10 +16,8 @@ export const requireAdmin = async () => {
   }
   
   try {
-    // Since we're connected to Supabase but may not have the profiles table,
-    // let's check the user's metadata instead
+    // Check the user's metadata for admin role
     const user = session.user;
-    // Assuming admin role is set in user metadata or using a hardcoded value for demo
     const isAdmin = user.app_metadata?.role === 'admin' || 
                    user.user_metadata?.role === 'admin' || 
                    user.email === 'admin@example.com'; // Fallback for demo
