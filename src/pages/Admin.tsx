@@ -1,5 +1,5 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Layout, 
   LucideHome, 
@@ -14,12 +14,16 @@ import {
   Trash2, 
   MoreHorizontal, 
   EyeIcon, 
-  Filter
+  Filter,
+  Link,
+  DollarSign
 } from 'lucide-react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
+import { requireAdmin } from '@/middleware/authMiddleware';
+import { toast } from 'sonner';
 
-// Sample blog posts data
 const blogPosts = [
   {
     id: '1',
@@ -83,6 +87,45 @@ const Admin = () => {
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      const isAdmin = await requireAdmin();
+      if (!isAdmin) {
+        navigate('/login');
+        return;
+      }
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+          
+        setUserProfile(profile);
+      }
+      
+      setLoading(false);
+    };
+    
+    checkAuth();
+  }, [navigate]);
+  
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      toast.error('Error signing out');
+    } else {
+      toast.success('Signed out successfully');
+      navigate('/login');
+    }
+  };
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -114,9 +157,19 @@ const Admin = () => {
     return matchesSearch && matchesStatus;
   });
   
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-lg font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen flex bg-secondary/30">
-      {/* Sidebar */}
       <aside 
         className={cn(
           "bg-background h-screen fixed top-0 left-0 bottom-0 z-50 transition-all duration-300 glass shadow-glass-strong border-r border-border",
@@ -124,7 +177,6 @@ const Admin = () => {
         )}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
           <div className="p-6 flex items-center">
             <div className="mr-2 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
               A
@@ -136,7 +188,6 @@ const Admin = () => {
             )}
           </div>
           
-          {/* Toggle button */}
           <button 
             onClick={toggleSidebar}
             className="absolute top-6 -right-4 bg-background border border-border rounded-full p-1 shadow-md button-subtle-hover"
@@ -144,35 +195,58 @@ const Admin = () => {
             <Layout size={16} />
           </button>
           
-          {/* Nav Links */}
           <nav className="flex-1 mt-6">
             <ul className="space-y-1 px-3">
               <li>
-                <a href="#dashboard" className="flex items-center px-3 py-3 rounded-md bg-primary text-white">
+                <a href="#dashboard" 
+                  className="flex items-center px-3 py-3 rounded-md bg-primary text-white"
+                  onClick={() => setActiveTab('dashboard')}
+                >
                   <LucideHome size={20} />
                   {sidebarOpen && <span className="ml-3">Dashboard</span>}
                 </a>
               </li>
               <li>
-                <a href="#posts" className="flex items-center px-3 py-3 rounded-md text-foreground/80 hover:bg-secondary transition-colors">
+                <a href="#posts" 
+                  className="flex items-center px-3 py-3 rounded-md text-foreground/80 hover:bg-secondary transition-colors"
+                  onClick={() => setActiveTab('posts')}
+                >
                   <FileText size={20} />
                   {sidebarOpen && <span className="ml-3">Posts</span>}
                 </a>
               </li>
               <li>
-                <a href="#users" className="flex items-center px-3 py-3 rounded-md text-foreground/80 hover:bg-secondary transition-colors">
+                <a href="#affiliates" 
+                  className="flex items-center px-3 py-3 rounded-md text-foreground/80 hover:bg-secondary transition-colors"
+                  onClick={() => setActiveTab('affiliates')}
+                >
+                  <Link size={20} />
+                  {sidebarOpen && <span className="ml-3">Affiliate Programs</span>}
+                </a>
+              </li>
+              <li>
+                <a href="#users" 
+                  className="flex items-center px-3 py-3 rounded-md text-foreground/80 hover:bg-secondary transition-colors"
+                  onClick={() => setActiveTab('users')}
+                >
                   <Users size={20} />
                   {sidebarOpen && <span className="ml-3">Users</span>}
                 </a>
               </li>
               <li>
-                <a href="#analytics" className="flex items-center px-3 py-3 rounded-md text-foreground/80 hover:bg-secondary transition-colors">
+                <a href="#analytics" 
+                  className="flex items-center px-3 py-3 rounded-md text-foreground/80 hover:bg-secondary transition-colors"
+                  onClick={() => setActiveTab('analytics')}
+                >
                   <BarChart3 size={20} />
                   {sidebarOpen && <span className="ml-3">Analytics</span>}
                 </a>
               </li>
               <li>
-                <a href="#settings" className="flex items-center px-3 py-3 rounded-md text-foreground/80 hover:bg-secondary transition-colors">
+                <a href="#settings" 
+                  className="flex items-center px-3 py-3 rounded-md text-foreground/80 hover:bg-secondary transition-colors"
+                  onClick={() => setActiveTab('settings')}
+                >
                   <Settings size={20} />
                   {sidebarOpen && <span className="ml-3">Settings</span>}
                 </a>
@@ -180,7 +254,6 @@ const Admin = () => {
             </ul>
           </nav>
           
-          {/* User */}
           <div className="p-4 border-t border-border mt-auto">
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
@@ -188,13 +261,16 @@ const Admin = () => {
               </div>
               {sidebarOpen && (
                 <div className="ml-3">
-                  <p className="font-medium text-sm">Admin User</p>
-                  <p className="text-xs text-muted-foreground">admin@example.com</p>
+                  <p className="font-medium text-sm">{userProfile?.full_name || 'Admin User'}</p>
+                  <p className="text-xs text-muted-foreground">{userProfile?.email || 'admin@example.com'}</p>
                 </div>
               )}
             </div>
             {sidebarOpen && (
-              <button className="mt-4 text-sm text-muted-foreground hover:text-foreground flex items-center w-full button-subtle-hover">
+              <button 
+                className="mt-4 text-sm text-muted-foreground hover:text-foreground flex items-center w-full button-subtle-hover"
+                onClick={handleLogout}
+              >
                 <LogOut size={16} className="mr-2" />
                 Logout
               </button>
@@ -203,7 +279,6 @@ const Admin = () => {
         </div>
       </aside>
       
-      {/* Main Content */}
       <main 
         className={cn(
           "flex-1 transition-all duration-300 pt-6 pb-12 px-6",
@@ -211,13 +286,11 @@ const Admin = () => {
         )}
       >
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
           <header className="mb-8">
             <h1 className="text-3xl font-bold">Dashboard</h1>
             <p className="text-muted-foreground">Welcome to your affiliate blog admin panel</p>
           </header>
           
-          {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="glass-card p-6">
               <div className="flex justify-between items-start">
@@ -294,131 +367,80 @@ const Admin = () => {
             </div>
           </div>
           
-          {/* Blog Posts Table */}
-          <div className="glass-card overflow-hidden mb-12">
-            <div className="p-6 border-b border-border">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                <h2 className="text-xl font-semibold mb-4 sm:mb-0">Blog Posts</h2>
-                <div className="flex space-x-2">
-                  <Button 
-                    variant="outline" 
-                    icon={<Plus size={16} />} 
-                    iconPosition="left"
-                  >
-                    New Post
-                  </Button>
-                  <div className="relative">
-                    <input 
-                      type="text"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Search posts..."
-                      className="py-2 pl-9 pr-4 rounded-md border border-border bg-background w-48 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                    />
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={15} />
-                  </div>
-                  <div className="relative">
-                    <select 
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="py-2 pl-9 pr-4 rounded-md border border-border bg-background appearance-none focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+          {activeTab === 'posts' && (
+            <div className="glass-card overflow-hidden mb-12">
+              <div className="p-6 border-b border-border">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                  <h2 className="text-xl font-semibold mb-4 sm:mb-0">Blog Posts</h2>
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      icon={<Plus size={16} />} 
+                      iconPosition="left"
                     >
-                      <option value="All">All Status</option>
-                      <option value="Published">Published</option>
-                      <option value="Draft">Draft</option>
-                    </select>
-                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={15} />
+                      New Post
+                    </Button>
+                    <div className="relative">
+                      <input 
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Search posts..."
+                        className="py-2 pl-9 pr-4 rounded-md border border-border bg-background w-48 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                      />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={15} />
+                    </div>
+                    <div className="relative">
+                      <select 
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="py-2 pl-9 pr-4 rounded-md border border-border bg-background appearance-none focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                      >
+                        <option value="All">All Status</option>
+                        <option value="Published">Published</option>
+                        <option value="Draft">Draft</option>
+                      </select>
+                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={15} />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="px-6 py-3 text-left">
-                      <div className="flex items-center">
-                        <input 
-                          type="checkbox"
-                          checked={selectedPosts.length === blogPosts.length}
-                          onChange={selectAllPosts}
-                          className="rounded border-border"
-                        />
-                      </div>
-                    </th>
-                    <th className="px-6 py-3 text-left font-medium text-sm">Title</th>
-                    <th className="px-6 py-3 text-left font-medium text-sm">Status</th>
-                    <th className="px-6 py-3 text-left font-medium text-sm">Category</th>
-                    <th className="px-6 py-3 text-left font-medium text-sm">Author</th>
-                    <th className="px-6 py-3 text-left font-medium text-sm">Date</th>
-                    <th className="px-6 py-3 text-left font-medium text-sm">Views</th>
-                    <th className="px-6 py-3 text-left font-medium text-sm">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPosts.map((post) => (
-                    <tr key={post.id} className="border-b border-border hover:bg-secondary/30 transition-colors">
-                      <td className="px-6 py-4">
-                        <input 
-                          type="checkbox"
-                          checked={selectedPosts.includes(post.id)}
-                          onChange={() => toggleSelectPost(post.id)}
-                          className="rounded border-border"
-                        />
-                      </td>
-                      <td className="px-6 py-4 font-medium">{post.title}</td>
-                      <td className="px-6 py-4">
-                        <span 
-                          className={cn(
-                            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                            post.status === 'Published' ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                          )}
-                        >
-                          {post.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">{post.category}</td>
-                      <td className="px-6 py-4">{post.author}</td>
-                      <td className="px-6 py-4 text-muted-foreground">{post.date}</td>
-                      <td className="px-6 py-4">{post.views.toLocaleString()}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex space-x-2">
-                          <button className="p-1.5 text-blue-600 hover:text-blue-800 transition-colors" title="Edit">
-                            <Edit2 size={16} />
-                          </button>
-                          <button className="p-1.5 text-red-600 hover:text-red-800 transition-colors" title="Delete">
-                            <Trash2 size={16} />
-                          </button>
-                          <button className="p-1.5 text-foreground/80 hover:text-foreground transition-colors" title="More Options">
-                            <MoreHorizontal size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            <div className="p-6 border-t border-border flex justify-between items-center">
-              <div className="text-sm text-muted-foreground">
-                Showing <span className="font-medium text-foreground">{filteredPosts.length}</span> of <span className="font-medium text-foreground">{blogPosts.length}</span> posts
-              </div>
               
-              <div className="flex space-x-1">
-                <button className="px-3 py-1 border border-border rounded-md text-sm">Previous</button>
-                <button className="px-3 py-1 bg-primary text-white rounded-md text-sm">1</button>
-                <button className="px-3 py-1 border border-border rounded-md text-sm">2</button>
-                <button className="px-3 py-1 border border-border rounded-md text-sm">3</button>
-                <button className="px-3 py-1 border border-border rounded-md text-sm">Next</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-};
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="px-6 py-3 text-left">
+                        <div className="flex items-center">
+                          <input 
+                            type="checkbox"
+                            checked={selectedPosts.length === blogPosts.length}
+                            onChange={selectAllPosts}
+                            className="rounded border-border"
+                          />
+                        </div>
+                      </th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Title</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Status</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Category</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Author</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Date</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Views</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredPosts.map((post) => (
+                      <tr key={post.id} className="border-b border-border hover:bg-secondary/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <input 
+                            type="checkbox"
+                            checked={selectedPosts.includes(post.id)}
+                            onChange={() => toggleSelectPost(post.id)}
+                            className="rounded border-border"
+                          />
+                        </td>
+                        <td className="px-6 py-4 font-medium">{post.title}</td>
+                        <td className="px-6 py-4">
+                          <span
 
-export default Admin;
