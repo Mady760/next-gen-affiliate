@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Zap, BarChart4, ShieldCheck } from 'lucide-react';
@@ -80,10 +79,10 @@ const Index = () => {
               <div className="flex flex-wrap gap-4">
                 <Button 
                   size="lg" 
-                  icon={<ArrowRight size={18} />} 
-                  iconPosition="right"
+                  className="flex items-center"
                 >
                   Get Started
+                  <ArrowRight size={18} className="ml-2" />
                 </Button>
                 <Button 
                   variant="outline" 
@@ -192,12 +191,11 @@ const Index = () => {
               Join thousands of successful affiliate marketers and bloggers who have elevated their strategy with our platform.
             </p>
             <Button 
-              size="lg" 
-              icon={<ArrowRight size={18} />} 
-              iconPosition="right"
-              className="mx-auto"
+              size="lg"
+              className="mx-auto flex items-center"
             >
               Get Started Today
+              <ArrowRight size={18} className="ml-2" />
             </Button>
           </div>
         </div>

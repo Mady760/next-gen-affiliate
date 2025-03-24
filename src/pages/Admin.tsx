@@ -19,7 +19,7 @@ import {
   Link,
   DollarSign
 } from 'lucide-react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { requireAdmin } from '@/middleware/authMiddleware';
