@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Calendar, Clock, Tag, Share2, Bookmark, ThumbsUp, User } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 
 const postData = {
   title: 'The Ultimate Guide to Affiliate Marketing in 2023',

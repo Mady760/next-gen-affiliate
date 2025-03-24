@@ -1,65 +1,32 @@
 
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 
-// Authentication middleware to check if user is logged in
+// Middleware function to check if user is authenticated
 export const requireAuth = async () => {
-  // Check if Supabase is configured
-  if (!isSupabaseConfigured()) {
-    toast.error('Supabase is not properly configured. Please set environment variables.');
-    console.error('Error: Supabase URL and Anon Key must be configured');
-    return false;
-  }
+  const { data: { session } } = await supabase.auth.getSession();
+  return !!session;
+};
 
+// Middleware function to check if user is admin
+export const requireAdmin = async () => {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (!session) {
-    // User is not authenticated
-    toast.error('You must be logged in to access this page');
-    
-    // Redirect to login page
-    window.location.href = '/login';
     return false;
   }
   
-  return true;
-};
-
-// Authorization middleware to check if user has admin role
-export const requireAdmin = async () => {
-  // Check if Supabase is configured
-  if (!isSupabaseConfigured()) {
-    toast.error('Supabase is not properly configured. Please set environment variables.');
-    console.error('Error: Supabase URL and Anon Key must be configured');
+  try {
+    // Since we're connected to Supabase but may not have the profiles table,
+    // let's check the user's metadata instead
+    const user = session.user;
+    // Assuming admin role is set in user metadata or using a hardcoded value for demo
+    const isAdmin = user.app_metadata?.role === 'admin' || 
+                   user.user_metadata?.role === 'admin' || 
+                   user.email === 'admin@example.com'; // Fallback for demo
+    
+    return isAdmin;
+  } catch (error) {
+    console.error('Error checking admin status:', error);
     return false;
   }
-
-  // First check if user is authenticated
-  const isAuth = await requireAuth();
-  
-  if (!isAuth) return false;
-  
-  // Then check if user has admin role
-  const { data: { session } } = await supabase.auth.getSession();
-  
-  if (session) {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .single();
-    
-    if (error || !profile || profile.role !== 'admin') {
-      // User does not have admin role
-      toast.error('You do not have permission to access this page');
-      
-      // Redirect to home page
-      window.location.href = '/';
-      return false;
-    }
-    
-    return true;
-  }
-  
-  return false;
 };

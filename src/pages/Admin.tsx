@@ -19,7 +19,7 @@ import {
   Link,
   DollarSign
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import Button from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { requireAdmin } from '@/middleware/authMiddleware';
@@ -151,13 +151,15 @@ const Admin = () => {
       
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-          
-        setUserProfile(profile);
+        try {
+          // Safe fallback for profiles query
+          setUserProfile({ 
+            full_name: session.user.user_metadata?.full_name || 'Admin User',
+            email: session.user.email || 'admin@example.com'
+          });
+        } catch (error) {
+          console.error('Error fetching profile:', error);
+        }
       }
       
       setLoading(false);

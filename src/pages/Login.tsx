@@ -1,12 +1,9 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
-import { Lock, Mail, EyeOff, Eye } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
+import Button from '@/components/ui/Button';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -17,35 +14,39 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error('Please enter both email and password');
+      return;
+    }
+    
     setLoading(true);
-
+    
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password,
+        password
       });
-
+      
       if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success('Logged in successfully');
-        
-        // Check if user is admin and redirect accordingly
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user?.id)
-          .single();
-        
-        if (profile?.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/');
-        }
+        throw error;
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      toast.error('An unexpected error occurred');
+      
+      // Set user profile safely
+      const user = data.user;
+      if (user) {
+        const userProfile = {
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || 'User'
+        };
+        
+        toast.success('Logged in successfully');
+        navigate('/admin');
+      }
+    } catch (error: any) {
+      console.error('Error logging in:', error);
+      toast.error(error.message || 'An error occurred during login');
     } finally {
       setLoading(false);
     }
