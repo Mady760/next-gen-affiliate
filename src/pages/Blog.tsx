@@ -6,7 +6,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import BlogCard from '@/components/ui/BlogCard';
 import FeaturedPost from '@/components/ui/FeaturedPost';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 // Sample data

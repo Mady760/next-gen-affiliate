@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Zap, BarChart4, ShieldCheck } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import BlogCard from '@/components/ui/BlogCard';
 import FeaturedPost from '@/components/ui/FeaturedPost';
 

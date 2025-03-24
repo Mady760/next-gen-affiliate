@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
-import Button from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 
