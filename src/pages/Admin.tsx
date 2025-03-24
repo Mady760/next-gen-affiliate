@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -81,9 +82,52 @@ const blogPosts = [
   }
 ];
 
+const affiliatePrograms = [
+  {
+    id: '1',
+    name: 'Amazon Associates',
+    category: 'Retail',
+    commission: '1-10%',
+    cookieDuration: '24 hours',
+    status: 'Active'
+  },
+  {
+    id: '2',
+    name: 'ShareASale',
+    category: 'Marketplace',
+    commission: '5-30%',
+    cookieDuration: '30 days',
+    status: 'Active'
+  },
+  {
+    id: '3',
+    name: 'ClickBank',
+    category: 'Digital Products',
+    commission: '50-75%',
+    cookieDuration: '60 days',
+    status: 'Inactive'
+  },
+  {
+    id: '4',
+    name: 'CJ Affiliate',
+    category: 'Marketplace',
+    commission: '5-25%',
+    cookieDuration: '30 days',
+    status: 'Active'
+  },
+  {
+    id: '5',
+    name: 'Awin',
+    category: 'Marketplace',
+    commission: '3-15%',
+    cookieDuration: '30 days',
+    status: 'Pending'
+  }
+];
+
 const Admin = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState('posts');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -359,9 +403,7 @@ const Admin = () => {
                   <h3 className="text-2xl font-bold mt-1">$4,385</h3>
                 </div>
                 <div className="p-2 bg-primary/10 rounded-md">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <DollarSign size={20} className="text-primary" />
                 </div>
               </div>
               <p className="text-sm text-green-600 mt-4 flex items-center">
@@ -486,5 +528,74 @@ const Admin = () => {
                   <div className="flex space-x-2">
                     <Button variant="outline">
                       <Plus size={16} className="mr-2" />
-                      Add
+                      Add Program
+                    </Button>
+                    <div className="relative">
+                      <input 
+                        type="text"
+                        placeholder="Search programs..."
+                        className="py-2 pl-9 pr-4 rounded-md border border-border bg-background w-48 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                      />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={15} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="px-6 py-3 text-left font-medium text-sm">Program Name</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Category</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Commission</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Cookie Duration</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Status</th>
+                      <th className="px-6 py-3 text-left font-medium text-sm">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {affiliatePrograms.map((program) => (
+                      <tr key={program.id} className="border-b border-border hover:bg-secondary/30 transition-colors">
+                        <td className="px-6 py-4 font-medium">{program.name}</td>
+                        <td className="px-6 py-4 text-sm">{program.category}</td>
+                        <td className="px-6 py-4 text-sm">{program.commission}</td>
+                        <td className="px-6 py-4 text-sm">{program.cookieDuration}</td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            program.status === 'Active' 
+                              ? 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-500' 
+                              : program.status === 'Inactive'
+                                ? 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-500'
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-500'
+                          }`}>
+                            {program.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-2">
+                            <button className="p-1 hover:bg-secondary rounded-full transition-colors">
+                              <Edit2 size={16} className="text-blue-500" />
+                            </button>
+                            <button className="p-1 hover:bg-secondary rounded-full transition-colors">
+                              <Link size={16} className="text-gray-500" />
+                            </button>
+                            <button className="p-1 hover:bg-secondary rounded-full transition-colors">
+                              <Trash2 size={16} className="text-red-500" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+};
 
+export default Admin;
