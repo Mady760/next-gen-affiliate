@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -442,5 +443,124 @@ const Admin = () => {
                         </td>
                         <td className="px-6 py-4 font-medium">{post.title}</td>
                         <td className="px-6 py-4">
-                          <span
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            post.status === 'Published' 
+                              ? 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-500' 
+                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-500'
+                          }`}>
+                            {post.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm">{post.category}</td>
+                        <td className="px-6 py-4 text-sm">{post.author}</td>
+                        <td className="px-6 py-4 text-sm">{post.date}</td>
+                        <td className="px-6 py-4 text-sm">{post.views > 0 ? post.views.toLocaleString() : '-'}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-2">
+                            <button className="p-1 hover:bg-secondary rounded-full transition-colors">
+                              <Edit2 size={16} className="text-blue-500" />
+                            </button>
+                            <button className="p-1 hover:bg-secondary rounded-full transition-colors">
+                              <EyeIcon size={16} className="text-gray-500" />
+                            </button>
+                            <button className="p-1 hover:bg-secondary rounded-full transition-colors">
+                              <Trash2 size={16} className="text-red-500" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          
+          {activeTab === 'affiliates' && (
+            <div className="glass-card overflow-hidden mb-12">
+              <div className="p-6 border-b border-border">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                  <h2 className="text-xl font-semibold mb-4 sm:mb-0">Affiliate Programs</h2>
+                  <Button variant="outline" icon={<Plus size={16} />} iconPosition="left">
+                    Add Program
+                  </Button>
+                </div>
+              </div>
+              <div className="p-6">
+                <p className="text-muted-foreground mb-4">Manage your affiliate programs and track performance.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="border border-border rounded-lg p-4 hover:bg-secondary/20 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium">Amazon Associates</h3>
+                        <p className="text-sm text-muted-foreground">Commission: 3-10%</p>
+                      </div>
+                      <div className="p-2 bg-primary/10 rounded-md">
+                        <DollarSign size={18} className="text-primary" />
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center text-sm">
+                      <span className="text-green-600 font-medium">Active</span>
+                      <span className="mx-2">•</span>
+                      <span>256 clicks this month</span>
+                    </div>
+                  </div>
+                  <div className="border border-border rounded-lg p-4 hover:bg-secondary/20 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium">ShareASale</h3>
+                        <p className="text-sm text-muted-foreground">Commission: Up to 30%</p>
+                      </div>
+                      <div className="p-2 bg-primary/10 rounded-md">
+                        <DollarSign size={18} className="text-primary" />
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center text-sm">
+                      <span className="text-green-600 font-medium">Active</span>
+                      <span className="mx-2">•</span>
+                      <span>128 clicks this month</span>
+                    </div>
+                  </div>
+                  <div className="border border-border rounded-lg p-4 hover:bg-secondary/20 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium">CJ Affiliate</h3>
+                        <p className="text-sm text-muted-foreground">Commission: Varies by merchant</p>
+                      </div>
+                      <div className="p-2 bg-primary/10 rounded-md">
+                        <DollarSign size={18} className="text-primary" />
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center text-sm">
+                      <span className="text-yellow-600 font-medium">Pending</span>
+                      <span className="mx-2">•</span>
+                      <span>Application in review</span>
+                    </div>
+                  </div>
+                  <div className="border border-border rounded-lg p-4 hover:bg-secondary/20 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-medium">Impact</h3>
+                        <p className="text-sm text-muted-foreground">Commission: 5-25%</p>
+                      </div>
+                      <div className="p-2 bg-primary/10 rounded-md">
+                        <DollarSign size={18} className="text-primary" />
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center text-sm">
+                      <span className="text-green-600 font-medium">Active</span>
+                      <span className="mx-2">•</span>
+                      <span>92 clicks this month</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+};
 
+export default Admin;
